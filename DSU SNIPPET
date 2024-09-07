@@ -1,0 +1,151 @@
+#include <bits/stdc++.h>
+//
+//#pragma GCC optimize("O3", "unroll-loops", "Ofast", "inline", "-ffast-math")
+//#pragma GCC target("avx,sse2,sse3,sse4,mmx")
+
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+
+using namespace __gnu_pbds;
+using namespace std;
+template<class T> using ordered_set = tree<T, null_type, less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+#define ll                 long long
+#define all(v)             v.begin(),v.end()
+#define  el   "\n"
+#define clr(v, val) memset(v,val,sizeof(v));
+#define debug(x)  cout<<#x<<" "<<x<<el;
+const int Mod = 1e9 + 7;
+const int Oo = 0x3F3F3F3F;
+const int N = 10000069;
+const int Inf = 1e9 + 7;
+#define  int long long
+
+void fast() {
+#ifndef ONLINE_JUDGE
+    freopen("input.txt", "r", stdin);
+    freopen("output.txt", "w", stdout);
+    freopen("error.txt", "w", stderr);
+#endif
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+}
+
+ll gcd(ll a, ll b) { return (b == 0 ? a : gcd(b, a % b)); }
+
+ll lcm(ll a, ll b) { return a / gcd(a, b) * b; }
+
+int dx[] = {0, 0, 1, -1, -1, 1, -1, 1};
+int dy[] = {-1, 1, 0, 0, 1, 1, -1, -1};
+
+struct Edge {
+    int v, w, u;
+
+//    Edge(int V = 0, int W = 0) {
+//        v = V;
+//        w = W;
+//    }
+
+    bool operator<(const Edge &other) const {
+        return w < other.w;
+    }
+};
+
+struct DSU {
+    vector<int> Parent, GroupSize;
+    int numOfGroups;
+
+    DSU(int n) {
+        numOfGroups = n;
+        Parent.resize(n + 2);
+        GroupSize.resize(n + 2);
+        for (int i = 0; i <= n; i++) {
+            Parent[i] = i;
+            GroupSize[i] = 1;
+        }
+    }
+
+    int getParent(int u) {
+        if (Parent[u] == u)
+            return u;
+        return Parent[u] = getParent(Parent[u]);
+    }
+
+    void merge(int u, int v) {
+        int par1 = getParent(u);
+        int par2 = getParent(v);
+        if (par1 == par2) {
+            return;
+        }
+        numOfGroups--;
+        if (GroupSize[par1] > GroupSize[par2]) {
+            Parent[par2] = par1;
+            GroupSize[par1] += GroupSize[par2];
+        } else {
+            Parent[par1] = par2;
+            GroupSize[par2] += GroupSize[par1];
+        }
+    }
+
+    bool sameGroup(int u, int v) {
+        int par1 = getParent(u);
+        int par2 = getParent(v);
+        return par2 == par1;
+    }
+
+    int getGroupSize(int u) {
+        int par = getParent(u);
+        return GroupSize[par];
+
+    }
+};
+
+
+void doWork() {
+
+    int n, m1, m2;
+    cin >> n >> m1 >> m2;
+    DSU dsu1(n + 2), dsu2(n + 2);
+    for (int i = 0; i < m1; i++) {
+        int u, v;
+        cin >> u >> v;
+        if (!dsu1.sameGroup(u, v)) {
+            dsu1.merge(u, v);
+        }
+
+    }
+    for (int i = 0; i < m2; i++) {
+        int u, v;
+        cin >> u >> v;
+        if (!dsu2.sameGroup(u, v)) {
+            dsu2.merge(u, v);
+        }
+    }
+    vector<pair<int, int>> ans;
+    for (int i = 1; i <= n; i++) {
+        for (int j = i; j <= n; j++) {
+            if (!dsu1.sameGroup(i, j) && !dsu2.sameGroup(i, j)) {
+                dsu1.merge(i, j);
+                dsu2.merge(i, j);
+                ans.push_back({i, j});
+            }
+
+        }
+    }
+    cout << ans.size() << el;
+
+    for (auto i: ans)cout << i.first << " " << i.second << el;
+
+}
+
+int32_t
+main() {
+
+    fast();
+    int tc = 1;
+    // cin >> tc;
+    while (tc--) {
+        doWork();
+        // cout << el;
+    }
+
+}
